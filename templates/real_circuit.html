@@ -1,0 +1,1412 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Real 8-bit Circuit Design</title>
+
+<style>
+
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+body{
+
+    min-height:100vh;
+
+    font-family:Arial,Helvetica,sans-serif;
+
+    color:white;
+
+    background:
+        radial-gradient(
+            circle at top,
+            #102b45,
+            #030811 55%,
+            #010308
+        );
+
+    overflow-x:hidden;
+}
+
+
+/* =========================
+   ANIMATED GRID
+========================= */
+
+body::before{
+
+    content:"";
+
+    position:fixed;
+
+    inset:0;
+
+    background-image:
+        linear-gradient(
+            rgba(0,230,255,.07) 1px,
+            transparent 1px
+        ),
+        linear-gradient(
+            90deg,
+            rgba(0,230,255,.07) 1px,
+            transparent 1px
+        );
+
+    background-size:40px 40px;
+
+    animation:gridMove 12s linear infinite;
+
+    z-index:-2;
+}
+
+@keyframes gridMove{
+
+    from{
+        transform:translateY(0);
+    }
+
+    to{
+        transform:translateY(40px);
+    }
+
+}
+
+
+/* =========================
+   MAIN
+========================= */
+
+.container{
+
+    width:94%;
+
+    max-width:1250px;
+
+    margin:auto;
+
+    padding:40px 0 70px;
+
+    text-align:center;
+}
+
+
+/* =========================
+   TITLE
+========================= */
+
+.title{
+
+    font-size:42px;
+
+    letter-spacing:4px;
+
+    color:#00eaff;
+
+    text-shadow:
+        0 0 10px #00eaff,
+        0 0 30px #00eaff;
+
+    animation:titleGlow 2s infinite alternate;
+}
+
+@keyframes titleGlow{
+
+    from{
+        text-shadow:0 0 10px #00eaff;
+    }
+
+    to{
+        text-shadow:
+            0 0 20px #00eaff,
+            0 0 45px #00eaff;
+    }
+
+}
+
+.subtitle{
+
+    margin-top:12px;
+
+    color:#a9dce8;
+
+    font-size:16px;
+}
+
+
+/* =========================
+   INPUT DISPLAY
+========================= */
+
+.inputs{
+
+    margin-top:35px;
+
+    display:flex;
+
+    justify-content:center;
+
+    gap:25px;
+
+    flex-wrap:wrap;
+}
+
+.input-box{
+
+    min-width:190px;
+
+    padding:20px;
+
+    border:1px solid #00eaff;
+
+    border-radius:14px;
+
+    background:rgba(0,20,35,.9);
+
+    box-shadow:
+        0 0 20px rgba(0,234,255,.25);
+}
+
+.input-box h3{
+
+    color:#00eaff;
+
+    margin-bottom:10px;
+}
+
+.input-value{
+
+    font-size:30px;
+
+    font-weight:bold;
+
+    color:#00ffb7;
+
+    text-shadow:
+        0 0 12px #00ffb7;
+}
+
+
+/* =========================
+   WORKING CIRCUIT
+========================= */
+
+.circuit-wrapper{
+
+    margin-top:45px;
+
+    padding:30px 15px;
+
+    border:1px solid #12657a;
+
+    border-radius:20px;
+
+    background:
+        rgba(1,12,24,.94);
+
+    box-shadow:
+        0 0 30px rgba(0,220,255,.12);
+
+    overflow-x:auto;
+}
+
+.circuit-title{
+
+    color:#00eaff;
+
+    font-size:25px;
+
+    margin-bottom:30px;
+
+    letter-spacing:2px;
+}
+
+
+/* =========================
+   CIRCUIT FLOW
+========================= */
+
+.flow{
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    gap:12px;
+
+    min-width:1050px;
+}
+
+
+/* =========================
+   CIRCUIT BLOCK
+========================= */
+
+.stage{
+
+    width:180px;
+
+    min-height:170px;
+
+    padding:20px 12px;
+
+    border:2px solid #087d95;
+
+    border-radius:14px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(3,30,48,.95),
+            rgba(2,12,25,.95)
+        );
+
+    position:relative;
+
+    transition:.3s;
+
+}
+
+.stage:hover{
+
+    border-color:#00eaff;
+
+    box-shadow:
+        0 0 25px #00eaff;
+
+    transform:translateY(-5px);
+}
+
+
+.stage h3{
+
+    color:#00eaff;
+
+    font-size:16px;
+
+    margin-bottom:18px;
+}
+
+
+/* =========================
+   AND GATES
+========================= */
+
+.gates{
+
+    display:grid;
+
+    grid-template-columns:repeat(2,1fr);
+
+    gap:8px;
+
+}
+
+.gate{
+
+    padding:8px 4px;
+
+    border:1px solid #00bcd4;
+
+    border-radius:8px;
+
+    background:#061d2c;
+
+    font-size:12px;
+
+    color:#bff8ff;
+
+    position:relative;
+
+    overflow:hidden;
+}
+
+
+/* moving signal */
+
+.gate::after{
+
+    content:"";
+
+    position:absolute;
+
+    width:25px;
+
+    height:3px;
+
+    background:#00ffb7;
+
+    box-shadow:
+        0 0 10px #00ffb7;
+
+    left:-30px;
+
+    top:50%;
+
+    animation:
+        signal 2s linear infinite;
+
+}
+
+.gate:nth-child(2)::after{
+    animation-delay:.2s;
+}
+
+.gate:nth-child(3)::after{
+    animation-delay:.4s;
+}
+
+.gate:nth-child(4)::after{
+    animation-delay:.6s;
+}
+
+@keyframes signal{
+
+    0%{
+        left:-30px;
+    }
+
+    100%{
+        left:110%;
+    }
+
+}
+
+
+/* =========================
+   PARTIAL PRODUCTS
+========================= */
+
+.pp-grid{
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(4,1fr);
+
+    gap:5px;
+
+}
+
+.pp{
+
+    height:25px;
+
+    border:1px solid #00d9ff;
+
+    border-radius:4px;
+
+    background:#062b3d;
+
+    font-size:9px;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    color:#8ff5ff;
+
+    animation:ppPulse 2s infinite;
+}
+
+.pp:nth-child(2){
+    animation-delay:.1s;
+}
+
+.pp:nth-child(3){
+    animation-delay:.2s;
+}
+
+.pp:nth-child(4){
+    animation-delay:.3s;
+}
+
+.pp:nth-child(5){
+    animation-delay:.4s;
+}
+
+.pp:nth-child(6){
+    animation-delay:.5s;
+}
+
+.pp:nth-child(7){
+    animation-delay:.6s;
+}
+
+.pp:nth-child(8){
+    animation-delay:.7s;
+}
+
+@keyframes ppPulse{
+
+    0%,100%{
+        opacity:.5;
+    }
+
+    50%{
+        opacity:1;
+
+        box-shadow:
+            0 0 8px #00eaff;
+    }
+
+}
+
+
+/* =========================
+   COMPRESSOR
+========================= */
+
+.compressor{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:10px;
+}
+
+.comp{
+
+    padding:9px;
+
+    border:1px solid #00ff99;
+
+    border-radius:8px;
+
+    background:#06251f;
+
+    color:#9dffdd;
+
+    font-size:12px;
+
+    animation:
+        compressorPulse 1.8s infinite;
+}
+
+.comp:nth-child(2){
+    animation-delay:.4s;
+}
+
+.comp:nth-child(3){
+    animation-delay:.8s;
+}
+
+@keyframes compressorPulse{
+
+    0%,100%{
+        box-shadow:none;
+    }
+
+    50%{
+        box-shadow:
+            0 0 15px #00ff99;
+    }
+
+}
+
+
+/* =========================
+   ADDERS
+========================= */
+
+.adders{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:10px;
+}
+
+.adder{
+
+    padding:10px;
+
+    border:1px solid #ffc400;
+
+    border-radius:8px;
+
+    background:#292208;
+
+    color:#ffe477;
+
+    font-size:12px;
+
+    animation:
+        adderPulse 2s infinite;
+}
+
+.adder:nth-child(2){
+    animation-delay:.5s;
+}
+
+.adder:nth-child(3){
+    animation-delay:1s;
+}
+
+@keyframes adderPulse{
+
+    0%,100%{
+        opacity:.65;
+    }
+
+    50%{
+        opacity:1;
+
+        box-shadow:
+            0 0 15px #ffc400;
+    }
+
+}
+
+
+/* =========================
+   OUTPUT
+========================= */
+
+.output{
+
+    width:170px;
+
+    min-height:170px;
+
+    border:2px solid #00ff99;
+
+    border-radius:15px;
+
+    background:
+        radial-gradient(
+            circle,
+            #07372c,
+            #031713
+        );
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:center;
+
+    align-items:center;
+
+    box-shadow:
+        0 0 25px rgba(0,255,153,.3);
+
+    animation:outputPulse 2s infinite;
+}
+
+@keyframes outputPulse{
+
+    0%,100%{
+        box-shadow:
+            0 0 15px rgba(0,255,153,.2);
+    }
+
+    50%{
+        box-shadow:
+            0 0 35px rgba(0,255,153,.65);
+    }
+
+}
+
+.output h3{
+
+    color:#00ff99;
+
+    margin-bottom:15px;
+}
+
+.output-value{
+
+    font-size:28px;
+
+    font-weight:bold;
+
+    color:#ffffff;
+}
+
+
+/* =========================
+   ARROWS
+========================= */
+
+.arrow{
+
+    color:#00ffcc;
+
+    font-size:32px;
+
+    font-weight:bold;
+
+    animation:arrowPulse 1.2s infinite;
+}
+
+@keyframes arrowPulse{
+
+    0%,100%{
+        opacity:.3;
+    }
+
+    50%{
+        opacity:1;
+
+        text-shadow:
+            0 0 15px #00ffcc;
+    }
+
+}
+
+
+/* =========================
+   WORKING EXPLANATION
+========================= */
+
+.explanation{
+
+    margin-top:35px;
+
+    text-align:left;
+
+    padding:28px;
+
+    border-radius:16px;
+
+    border:1px solid #155d72;
+
+    background:
+        rgba(3,15,27,.94);
+}
+
+.explanation h2{
+
+    color:#00eaff;
+
+    margin-bottom:18px;
+}
+
+.explanation p{
+
+    color:#c9e9ef;
+
+    line-height:1.8;
+
+    font-size:15px;
+}
+
+.steps{
+
+    margin-top:22px;
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(4,1fr);
+
+    gap:15px;
+}
+
+.step{
+
+    padding:18px;
+
+    border-radius:10px;
+
+    background:#061927;
+
+    border:1px solid #125d70;
+}
+
+.step strong{
+
+    color:#00ffb7;
+
+    display:block;
+
+    margin-bottom:8px;
+}
+
+
+/* =========================
+   METRICS
+========================= */
+
+.metrics{
+
+    margin-top:35px;
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(3,1fr);
+
+    gap:20px;
+}
+
+.metric{
+
+    padding:22px;
+
+    border-radius:14px;
+
+    background:
+        rgba(4,19,32,.9);
+
+    border:1px solid #176b83;
+}
+
+.metric h4{
+
+    color:#9bddea;
+
+    margin-bottom:10px;
+}
+
+.metric-value{
+
+    font-size:28px;
+
+    font-weight:bold;
+
+    color:#00ffcc;
+}
+
+
+/* =========================
+   BUTTONS
+========================= */
+
+.buttons{
+
+    margin-top:40px;
+
+    display:flex;
+
+    justify-content:center;
+
+    gap:18px;
+
+    flex-wrap:wrap;
+}
+
+button{
+
+    padding:14px 25px;
+
+    border:none;
+
+    border-radius:9px;
+
+    cursor:pointer;
+
+    font-weight:bold;
+
+    letter-spacing:.5px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #00a8cc,
+            #00eaff
+        );
+
+    color:#00131b;
+
+    box-shadow:
+        0 0 15px rgba(0,234,255,.35);
+
+    transition:.3s;
+}
+
+button:hover{
+
+    transform:
+        translateY(-4px);
+
+    box-shadow:
+        0 0 28px rgba(0,234,255,.8);
+}
+
+.back{
+
+    background:
+        linear-gradient(
+            90deg,
+            #174d68,
+            #00a8cc
+        );
+
+    color:white;
+}
+
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media(max-width:800px){
+
+    .title{
+        font-size:28px;
+    }
+
+    .metrics{
+        grid-template-columns:1fr;
+    }
+
+    .steps{
+        grid-template-columns:1fr;
+    }
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<div class="container">
+
+
+    <!-- TITLE -->
+
+    <h1 class="title">
+        REAL 8-BIT CIRCUIT DESIGN
+    </h1>
+
+    <p class="subtitle">
+        Working Gate-Level Architecture of an 8-bit Approximate Multiplier
+    </p>
+
+
+    <!-- INPUTS -->
+
+    <div class="inputs">
+
+        <div class="input-box">
+
+            <h3>INPUT A</h3>
+
+            <div
+                class="input-value"
+                id="inputA">
+                --
+            </div>
+
+            <small>
+                8-bit
+            </small>
+
+        </div>
+
+
+        <div class="input-box">
+
+            <h3>INPUT B</h3>
+
+            <div
+                class="input-value"
+                id="inputB">
+                --
+            </div>
+
+            <small>
+                8-bit
+            </small>
+
+        </div>
+
+    </div>
+
+
+    <!-- WORKING CIRCUIT -->
+
+    <div class="circuit-wrapper">
+
+        <div class="circuit-title">
+
+            ⚡ 8-BIT APPROXIMATE MULTIPLIER — WORKING CIRCUIT
+
+        </div>
+
+
+        <div class="flow">
+
+
+            <!-- INPUT -->
+
+            <div class="stage">
+
+                <h3>
+                    8-BIT INPUT
+                </h3>
+
+                <p style="color:#bdeff5;line-height:2;">
+
+                    A[7:0]<br>
+                    B[7:0]
+
+                </p>
+
+                <br>
+
+                <p style="font-size:12px;color:#7ed9e8;">
+
+                    Binary inputs
+
+                </p>
+
+            </div>
+
+
+            <div class="arrow">
+                →
+            </div>
+
+
+            <!-- AND ARRAY -->
+
+            <div class="stage">
+
+                <h3>
+                    AND GATE ARRAY
+                </h3>
+
+                <div class="gates">
+
+                    <div class="gate">AND</div>
+                    <div class="gate">AND</div>
+                    <div class="gate">AND</div>
+                    <div class="gate">AND</div>
+                    <div class="gate">AND</div>
+                    <div class="gate">AND</div>
+                    <div class="gate">AND</div>
+                    <div class="gate">AND</div>
+
+                </div>
+
+                <br>
+
+                <small style="color:#77dce8;">
+                    Partial-product generation
+                </small>
+
+            </div>
+
+
+            <div class="arrow">
+                →
+            </div>
+
+
+            <!-- PARTIAL PRODUCTS -->
+
+            <div class="stage">
+
+                <h3>
+                    PARTIAL PRODUCTS
+                </h3>
+
+                <div class="pp-grid">
+
+                    <div class="pp">PP0</div>
+                    <div class="pp">PP1</div>
+                    <div class="pp">PP2</div>
+                    <div class="pp">PP3</div>
+
+                    <div class="pp">PP4</div>
+                    <div class="pp">PP5</div>
+                    <div class="pp">PP6</div>
+                    <div class="pp">PP7</div>
+
+                    <div class="pp">PP8</div>
+                    <div class="pp">PP9</div>
+                    <div class="pp">PP10</div>
+                    <div class="pp">PP11</div>
+
+                    <div class="pp">PP12</div>
+                    <div class="pp">PP13</div>
+                    <div class="pp">PP14</div>
+                    <div class="pp">PP15</div>
+
+                </div>
+
+                <br>
+
+                <small style="color:#77dce8;">
+                    Generated from A × B
+                </small>
+
+            </div>
+
+
+            <div class="arrow">
+                →
+            </div>
+
+
+            <!-- APPROXIMATE COMPRESSOR -->
+
+            <div class="stage">
+
+                <h3>
+                    APPROXIMATE
+                    COMPRESSOR
+                </h3>
+
+                <div class="compressor">
+
+                    <div class="comp">
+                        AC-1
+                    </div>
+
+                    <div class="comp">
+                        AC-2
+                    </div>
+
+                    <div class="comp">
+                        AC-3
+                    </div>
+
+                </div>
+
+                <br>
+
+                <small style="color:#7fffd0;">
+                    Error-tolerant reduction
+                </small>
+
+            </div>
+
+
+            <div class="arrow">
+                →
+            </div>
+
+
+            <!-- ADDERS -->
+
+            <div class="stage">
+
+                <h3>
+                    ADDER STAGE
+                </h3>
+
+                <div class="adders">
+
+                    <div class="adder">
+                        HA
+                    </div>
+
+                    <div class="adder">
+                        FA
+                    </div>
+
+                    <div class="adder">
+                        RCA
+                    </div>
+
+                </div>
+
+                <br>
+
+                <small style="color:#ffe477;">
+                    Sum + Carry
+                </small>
+
+            </div>
+
+
+            <div class="arrow">
+                →
+            </div>
+
+
+            <!-- OUTPUT -->
+
+            <div class="output">
+
+                <h3>
+                    OUTPUT
+                </h3>
+
+                <div
+                    class="output-value"
+                    id="output">
+                    --
+                </div>
+
+                <small>
+                    Approximate Result
+                </small>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+
+    <!-- HOW IT WORKS -->
+
+    <div class="explanation">
+
+        <h2>
+            How the 8-bit Circuit Works
+        </h2>
+
+        <p>
+
+            The circuit takes two 8-bit binary inputs,
+            A and B. Each input bit is combined using
+            AND logic to generate partial products.
+            The partial products are then reduced using
+            approximate compressor logic. Finally,
+            half adders, full adders and a reduction
+            adder combine the remaining sum and carry
+            signals to produce the approximate
+            multiplication result.
+
+        </p>
+
+
+        <div class="steps">
+
+
+            <div class="step">
+
+                <strong>
+                    01 — INPUT
+                </strong>
+
+                A[7:0] and B[7:0] enter the multiplier.
+
+            </div>
+
+
+            <div class="step">
+
+                <strong>
+                    02 — AND GATES
+                </strong>
+
+                Input bits generate the partial products.
+
+            </div>
+
+
+            <div class="step">
+
+                <strong>
+                    03 — APPROXIMATION
+                </strong>
+
+                Approximate compressors reduce hardware
+                complexity and introduce controlled error.
+
+            </div>
+
+
+            <div class="step">
+
+                <strong>
+                    04 — OUTPUT
+                </strong>
+
+                Adders combine the signals and produce
+                the approximate multiplication result.
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+
+    <!-- ML METRICS -->
+
+    <div class="metrics">
+
+
+        <div class="metric">
+
+            <h4>
+                PREDICTED AREA
+            </h4>
+
+            <div
+                class="metric-value"
+                id="area">
+                --
+            </div>
+
+        </div>
+
+
+        <div class="metric">
+
+            <h4>
+                ACCURACY
+            </h4>
+
+            <div
+                class="metric-value"
+                id="accuracy">
+                --
+            </div>
+
+        </div>
+
+
+        <div class="metric">
+
+            <h4>
+                PREDICTION ERROR
+            </h4>
+
+            <div
+                class="metric-value"
+                id="predictionError">
+                --
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+    <!-- BUTTONS -->
+
+    <div class="buttons">
+
+
+        <button
+            class="back"
+            onclick="backToCircuit()">
+
+            ← BACK TO CIRCUIT ANALYSIS
+
+        </button>
+
+
+        <button
+            onclick="newPrediction()">
+
+            ↻ NEW PREDICTION
+
+        </button>
+
+
+    </div>
+
+
+</div>
+
+
+<script>
+
+
+/* =========================
+   GET PREDICTION DATA
+========================= */
+
+const savedData =
+    sessionStorage.getItem(
+        "predictionData"
+    );
+
+
+if(savedData){
+
+    const data =
+        JSON.parse(savedData);
+
+
+    document.getElementById(
+        "inputA"
+    ).textContent =
+        data.A;
+
+
+    document.getElementById(
+        "inputB"
+    ).textContent =
+        data.B;
+
+
+    document.getElementById(
+        "output"
+    ).textContent =
+        data.Y;
+
+
+    document.getElementById(
+        "area"
+    ).textContent =
+        data.area;
+
+
+    document.getElementById(
+        "accuracy"
+    ).textContent =
+        data.accuracy + "%";
+
+
+    document.getElementById(
+        "predictionError"
+    ).textContent =
+        data.prediction_error + "%";
+
+}
+
+
+/* =========================
+   BACK TO CIRCUIT
+========================= */
+
+function backToCircuit(){
+
+    window.location.href =
+        "/circuit";
+
+}
+
+
+/* =========================
+   NEW PREDICTION
+========================= */
+
+function newPrediction(){
+
+    sessionStorage.removeItem(
+        "predictionData"
+    );
+
+    window.location.href =
+        "/dashboard";
+
+}
+
+
+</script>
+
+
+</body>
+
+</html>

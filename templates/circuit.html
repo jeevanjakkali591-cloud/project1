@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Circuit Analysis</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+
+            min-height: 100vh;
+
+            font-family:
+                Arial,
+                Helvetica,
+                sans-serif;
+
+            background:
+                radial-gradient(
+                    circle at top,
+                    #102a43,
+                    #050b14 55%,
+                    #02050a
+                );
+
+            color: white;
+
+            overflow-x: hidden;
+
+        }
+
+
+        /* =========================
+           ANIMATED GRID
+        ========================= */
+
+        body::before {
+
+            content: "";
+
+            position: fixed;
+
+            inset: 0;
+
+            background-image:
+                linear-gradient(
+                    rgba(0, 220, 255, 0.08) 1px,
+                    transparent 1px
+                ),
+                linear-gradient(
+                    90deg,
+                    rgba(0, 220, 255, 0.08) 1px,
+                    transparent 1px
+                );
+
+            background-size: 45px 45px;
+
+            animation:
+                gridMove 12s linear infinite;
+
+            pointer-events: none;
+
+            z-index: -1;
+
+        }
+
+
+        @keyframes gridMove {
+
+            from {
+                transform: translateY(0);
+            }
+
+            to {
+                transform: translateY(45px);
+            }
+
+        }
+
+
+        /* =========================
+           MAIN CONTAINER
+        ========================= */
+
+        .container {
+
+            width: 92%;
+
+            max-width: 1200px;
+
+            margin: auto;
+
+            padding: 45px 0 70px;
+
+            text-align: center;
+
+        }
+
+
+        /* =========================
+           TITLE
+        ========================= */
+
+        .title {
+
+            font-size: 45px;
+
+            font-weight: 800;
+
+            letter-spacing: 4px;
+
+            color: #00eaff;
+
+            text-shadow:
+                0 0 10px #00eaff,
+                0 0 30px #00eaff;
+
+            animation:
+                titleGlow 2s infinite alternate;
+
+        }
+
+
+        @keyframes titleGlow {
+
+            from {
+                text-shadow:
+                    0 0 10px #00eaff;
+            }
+
+            to {
+                text-shadow:
+                    0 0 20px #00eaff,
+                    0 0 45px #00eaff;
+            }
+
+        }
+
+
+        .subtitle {
+
+            margin-top: 12px;
+
+            color: #a9dce8;
+
+            font-size: 17px;
+
+            letter-spacing: 1px;
+
+        }
+
+
+        /* =========================
+           CIRCUIT AREA
+        ========================= */
+
+        .circuit-area {
+
+            margin-top: 55px;
+
+            display: flex;
+
+            justify-content: center;
+
+            align-items: center;
+
+            gap: 25px;
+
+            flex-wrap: wrap;
+
+        }
+
+
+        .block {
+
+            width: 210px;
+
+            min-height: 130px;
+
+            padding: 25px 15px;
+
+            border: 1px solid #00eaff;
+
+            border-radius: 15px;
+
+            background:
+                rgba(0, 20, 35, 0.9);
+
+            box-shadow:
+                0 0 15px rgba(0, 234, 255, 0.35);
+
+            position: relative;
+
+            transition:
+                0.3s;
+
+            animation:
+                blockFloat 3s ease-in-out infinite;
+
+        }
+
+
+        .block:nth-child(2) {
+            animation-delay: .3s;
+        }
+
+        .block:nth-child(3) {
+            animation-delay: .6s;
+        }
+
+        .block:nth-child(4) {
+            animation-delay: .9s;
+        }
+
+        .block:nth-child(5) {
+            animation-delay: 1.2s;
+        }
+
+
+        @keyframes blockFloat {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-8px);
+            }
+
+        }
+
+
+        .block:hover {
+
+            transform:
+                scale(1.06);
+
+            box-shadow:
+                0 0 30px #00eaff;
+
+        }
+
+
+        .block h3 {
+
+            color: #00eaff;
+
+            margin-bottom: 15px;
+
+            font-size: 18px;
+
+        }
+
+
+        .block p {
+
+            color: #d9f8ff;
+
+            font-size: 14px;
+
+            line-height: 1.6;
+
+        }
+
+
+        .arrow {
+
+            font-size: 35px;
+
+            color: #00ffcc;
+
+            animation:
+                arrowPulse 1.5s infinite;
+
+        }
+
+
+        @keyframes arrowPulse {
+
+            0%,
+            100% {
+                opacity: .4;
+            }
+
+            50% {
+                opacity: 1;
+            }
+
+        }
+
+
+        /* =========================
+           SIGNAL LINES
+        ========================= */
+
+        .signal {
+
+            height: 3px;
+
+            width: 100%;
+
+            margin-top: 40px;
+
+            background:
+                linear-gradient(
+                    90deg,
+                    transparent,
+                    #00eaff,
+                    transparent
+                );
+
+            animation:
+                signalMove 2s linear infinite;
+
+        }
+
+
+        @keyframes signalMove {
+
+            0% {
+                transform: translateX(-100%);
+            }
+
+            100% {
+                transform: translateX(100%);
+            }
+
+        }
+
+
+        /* =========================
+           METRIC CARDS
+        ========================= */
+
+        .metrics {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(
+                    3,
+                    1fr
+                );
+
+            gap: 20px;
+
+            margin-top: 55px;
+
+        }
+
+
+        .metric {
+
+            padding: 25px;
+
+            border-radius: 15px;
+
+            background:
+                rgba(5, 20, 35, .9);
+
+            border:
+                1px solid #176b83;
+
+            box-shadow:
+                0 0 15px
+                rgba(
+                    0,
+                    234,
+                    255,
+                    .15
+                );
+
+        }
+
+
+        .metric h4 {
+
+            color: #9bddea;
+
+            margin-bottom: 12px;
+
+        }
+
+
+        .metric-value {
+
+            font-size: 30px;
+
+            font-weight: bold;
+
+            color: #00ffcc;
+
+            text-shadow:
+                0 0 10px #00ffcc;
+
+        }
+
+
+        /* =========================
+           INFORMATION
+        ========================= */
+
+        .information {
+
+            margin-top: 55px;
+
+            padding: 30px;
+
+            border-radius: 18px;
+
+            background:
+                rgba(5, 15, 28, .92);
+
+            border:
+                1px solid #155d72;
+
+            text-align: left;
+
+        }
+
+
+        .information h2 {
+
+            color: #00eaff;
+
+            margin-bottom: 18px;
+
+        }
+
+
+        .information p {
+
+            color: #c4e7ee;
+
+            line-height: 1.8;
+
+            font-size: 15px;
+
+        }
+
+
+        /* =========================
+           BUTTONS
+        ========================= */
+
+        .buttons {
+
+            margin-top: 45px;
+
+            display: flex;
+
+            justify-content: center;
+
+            gap: 20px;
+
+            flex-wrap: wrap;
+
+        }
+
+
+        button {
+
+            padding:
+                15px 28px;
+
+            border: none;
+
+            border-radius: 10px;
+
+            background:
+                linear-gradient(
+                    90deg,
+                    #00a8cc,
+                    #00eaff
+                );
+
+            color: #00131b;
+
+            font-size: 14px;
+
+            font-weight: bold;
+
+            cursor: pointer;
+
+            letter-spacing: 1px;
+
+            box-shadow:
+                0 0 15px
+                rgba(
+                    0,
+                    234,
+                    255,
+                    .4
+                );
+
+            transition:
+                .3s;
+
+        }
+
+
+        button:hover {
+
+            transform:
+                translateY(-4px)
+                scale(1.03);
+
+            box-shadow:
+                0 0 30px
+                rgba(
+                    0,
+                    234,
+                    255,
+                    .8
+                );
+
+        }
+
+
+        .real-button {
+
+            background:
+                linear-gradient(
+                    90deg,
+                    #00ff99,
+                    #00eaff
+                );
+
+        }
+
+
+        /* =========================
+           RESPONSIVE
+        ========================= */
+
+        @media
+        (max-width: 850px) {
+
+            .title {
+
+                font-size: 30px;
+
+            }
+
+            .metrics {
+
+                grid-template-columns:
+                    1fr;
+
+            }
+
+            .arrow {
+
+                display: none;
+
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="container">
+
+
+    <!-- TITLE -->
+
+    <h1 class="title">
+
+        CIRCUIT ANALYSIS
+
+    </h1>
+
+
+    <p class="subtitle">
+
+        Approximate 8-bit Multiplier Architecture
+
+    </p>
+
+
+    <!-- CIRCUIT FLOW -->
+
+    <div class="circuit-area">
+
+
+        <div class="block">
+
+            <h3>INPUT A</h3>
+
+            <p>
+
+                8-bit input<br>
+
+                A[7:0]
+
+            </p>
+
+        </div>
+
+
+        <div class="arrow">
+
+            →
+
+        </div>
+
+
+        <div class="block">
+
+            <h3>PARTIAL PRODUCTS</h3>
+
+            <p>
+
+                Partial Product<br>
+
+                Generation
+
+            </p>
+
+        </div>
+
+
+        <div class="arrow">
+
+            →
+
+        </div>
+
+
+        <div class="block">
+
+            <h3>APPROXIMATE<br>COMPRESSOR</h3>
+
+            <p>
+
+                Error-tolerant<br>
+
+                compression
+
+            </p>
+
+        </div>
+
+
+        <div class="arrow">
+
+            →
+
+        </div>
+
+
+        <div class="block">
+
+            <h3>ADDER</h3>
+
+            <p>
+
+                Reduction<br>
+
+                and addition
+
+            </p>
+
+        </div>
+
+
+        <div class="arrow">
+
+            →
+
+        </div>
+
+
+        <div class="block">
+
+            <h3>OUTPUT Y</h3>
+
+            <p>
+
+                16-bit output<br>
+
+                Y[15:0]
+
+            </p>
+
+        </div>
+
+
+    </div>
+
+
+    <!-- SIGNAL ANIMATION -->
+
+    <div class="signal"></div>
+
+
+    <!-- METRICS -->
+
+    <div class="metrics">
+
+
+        <div class="metric">
+
+            <h4>
+
+                PREDICTED AREA
+
+            </h4>
+
+            <div
+                class="metric-value"
+                id="area"
+            >
+
+                --
+
+            </div>
+
+        </div>
+
+
+        <div class="metric">
+
+            <h4>
+
+                ACCURACY
+
+            </h4>
+
+            <div
+                class="metric-value"
+                id="accuracy"
+            >
+
+                --
+
+            </div>
+
+        </div>
+
+
+        <div class="metric">
+
+            <h4>
+
+                PREDICTION ERROR
+
+            </h4>
+
+            <div
+                class="metric-value"
+                id="predictionError"
+            >
+
+                --
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+    <!-- INFORMATION -->
+
+    <div class="information">
+
+
+        <h2>
+
+            How the Circuit Works
+
+        </h2>
+
+
+        <p>
+
+            The approximate 8-bit multiplier receives two
+            8-bit inputs, A and B. The inputs are used to
+            generate partial products. These partial
+            products are reduced using approximate
+            compressor logic and adders. The final
+            result is produced as a 16-bit output.
+
+            <br><br>
+
+            Approximation reduces hardware complexity and
+            area while allowing a small amount of
+            computational error. The ML model predicts
+            important design parameters such as area,
+            accuracy and prediction error.
+
+        </p>
+
+
+    </div>
+
+
+    <!-- BUTTONS -->
+
+    <div class="buttons">
+
+
+        <button
+            onclick="viewGraphs()"
+        >
+
+            GRAPH ANALYSIS
+
+        </button>
+
+
+        <!-- NEW REAL CIRCUIT BUTTON -->
+
+        <button
+            class="real-button"
+            onclick="viewRealCircuit()"
+        >
+
+            ⚡ REAL CIRCUIT DESIGN
+
+        </button>
+
+
+        <button
+            onclick="newPrediction()"
+        >
+
+            ↻ NEW PREDICTION
+
+        </button>
+
+
+    </div>
+
+
+</div>
+
+
+
+<script>
+
+
+/* =========================
+   LOAD PREDICTION DATA
+========================= */
+
+
+const savedData =
+    sessionStorage.getItem(
+        "predictionData"
+    );
+
+
+if (savedData) {
+
+
+    const data =
+        JSON.parse(savedData);
+
+
+    document.getElementById(
+        "area"
+    ).textContent =
+        data.area;
+
+
+    document.getElementById(
+        "accuracy"
+    ).textContent =
+        data.accuracy + "%";
+
+
+    document.getElementById(
+        "predictionError"
+    ).textContent =
+        data.prediction_error + "%";
+
+
+}
+
+
+
+/* =========================
+   GRAPH PAGE
+========================= */
+
+
+function viewGraphs() {
+
+    window.location.href =
+        "/graphs";
+
+}
+
+
+
+/* =========================
+   REAL CIRCUIT DESIGN
+========================= */
+
+
+function viewRealCircuit() {
+
+    window.location.href =
+        "/real-circuit";
+
+}
+
+
+
+/* =========================
+   NEW PREDICTION
+========================= */
+
+
+function newPrediction() {
+
+    sessionStorage.removeItem(
+        "predictionData"
+    );
+
+    window.location.href =
+        "/dashboard";
+
+}
+
+
+</script>
+
+
+</body>
+
+</html>

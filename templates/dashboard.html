@@ -1,0 +1,505 @@
+```html
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>AI Multiplier Prediction</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+
+            margin: 0;
+
+            min-height: 100vh;
+
+            font-family: Arial, sans-serif;
+
+            background:
+                radial-gradient(
+                    circle at center,
+                    #172554,
+                    #020617 70%
+                );
+
+            color: white;
+
+            display: flex;
+
+            justify-content: center;
+
+            align-items: center;
+
+            overflow: hidden;
+        }
+
+
+        .container {
+
+            width: 90%;
+
+            max-width: 900px;
+
+            text-align: center;
+
+            animation: appear 1s ease;
+        }
+
+
+        @keyframes appear {
+
+            from {
+
+                opacity: 0;
+
+                transform: translateY(30px);
+            }
+
+            to {
+
+                opacity: 1;
+
+                transform: translateY(0);
+            }
+        }
+
+
+        h1 {
+
+            font-size: 42px;
+
+            margin-bottom: 10px;
+        }
+
+
+        .subtitle {
+
+            color: #93c5fd;
+
+            margin-bottom: 45px;
+
+            font-size: 18px;
+        }
+
+
+        .inputs {
+
+            display: flex;
+
+            justify-content: center;
+
+            align-items: center;
+
+            gap: 25px;
+        }
+
+
+        .input-box {
+
+            background:
+                rgba(15, 23, 42, 0.9);
+
+            border:
+                1px solid #38bdf8;
+
+            border-radius: 20px;
+
+            padding: 25px;
+
+            width: 250px;
+
+            box-shadow:
+                0 0 25px
+                rgba(56, 189, 248, 0.25);
+        }
+
+
+        .input-box label {
+
+            display: block;
+
+            font-size: 18px;
+
+            margin-bottom: 15px;
+
+            color: #7dd3fc;
+        }
+
+
+        input {
+
+            width: 100%;
+
+            padding: 15px;
+
+            border-radius: 12px;
+
+            border: none;
+
+            outline: none;
+
+            text-align: center;
+
+            font-size: 22px;
+
+            background: #e0f2fe;
+
+            color: #020617;
+        }
+
+
+        .multiply {
+
+            font-size: 40px;
+
+            color: #38bdf8;
+
+            animation: pulse 1.5s infinite;
+        }
+
+
+        @keyframes pulse {
+
+            50% {
+
+                transform: scale(1.2);
+
+                text-shadow:
+                    0 0 20px #38bdf8;
+            }
+        }
+
+
+        button {
+
+            margin-top: 45px;
+
+            padding: 16px 45px;
+
+            border: none;
+
+            border-radius: 30px;
+
+            background:
+                linear-gradient(
+                    90deg,
+                    #06b6d4,
+                    #2563eb
+                );
+
+            color: white;
+
+            font-size: 18px;
+
+            font-weight: bold;
+
+            cursor: pointer;
+
+            box-shadow:
+                0 0 25px
+                rgba(37, 99, 235, 0.5);
+
+            transition: 0.3s;
+        }
+
+
+        button:hover {
+
+            transform: scale(1.06);
+
+            box-shadow:
+                0 0 40px
+                rgba(56, 189, 248, 0.8);
+        }
+
+
+        #status {
+
+            margin-top: 25px;
+
+            min-height: 25px;
+
+            color: #7dd3fc;
+
+            font-size: 16px;
+        }
+
+
+        .engine {
+
+            margin-top: 35px;
+
+            color: #94a3b8;
+
+            font-size: 14px;
+        }
+
+
+        @media(max-width: 700px) {
+
+            .inputs {
+
+                flex-direction: column;
+            }
+
+
+            .multiply {
+
+                transform: rotate(90deg);
+            }
+
+
+            h1 {
+
+                font-size: 30px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="container">
+
+
+    <h1>
+        AI Multiplier Prediction
+    </h1>
+
+
+    <div class="subtitle">
+
+        Approximate 8-bit Multiplier Analysis
+
+    </div>
+
+
+    <div class="inputs">
+
+
+        <div class="input-box">
+
+            <label>
+                Input A
+            </label>
+
+            <input
+                id="inputA"
+                type="number"
+                min="0"
+                max="255"
+                value="37"
+            >
+
+        </div>
+
+
+        <div class="multiply">
+            ×
+        </div>
+
+
+        <div class="input-box">
+
+            <label>
+                Input B
+            </label>
+
+            <input
+                id="inputB"
+                type="number"
+                min="0"
+                max="255"
+                value="74"
+            >
+
+        </div>
+
+
+    </div>
+
+
+    <button onclick="runPrediction()">
+
+        RUN PREDICTION
+
+    </button>
+
+
+    <div id="status"></div>
+
+
+    <div class="engine">
+
+        Powered by Random Forest ML Model
+
+    </div>
+
+
+</div>
+
+
+<script>
+
+
+async function runPrediction() {
+
+
+    const A =
+        Number(
+            document.getElementById("inputA").value
+        );
+
+
+    const B =
+        Number(
+            document.getElementById("inputB").value
+        );
+
+
+    const status =
+        document.getElementById("status");
+
+
+    // Check input
+    if (
+        isNaN(A) ||
+        isNaN(B)
+    ) {
+
+        status.innerHTML =
+            "Please enter both values.";
+
+        return;
+    }
+
+
+    // Check 8-bit range
+    if (
+        A < 0 ||
+        A > 255 ||
+        B < 0 ||
+        B > 255
+    ) {
+
+        status.innerHTML =
+            "Please enter values between 0 and 255.";
+
+        return;
+    }
+
+
+    status.innerHTML =
+        "Running ML prediction...";
+
+
+    try {
+
+
+        const response =
+            await fetch(
+                "/predict",
+                {
+
+                    method: "POST",
+
+                    headers: {
+
+                        "Content-Type":
+                            "application/json"
+
+                    },
+
+                    body:
+                        JSON.stringify({
+
+                            A: A,
+
+                            B: B
+
+                        })
+
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        console.log(
+            "Prediction received:",
+            data
+        );
+
+
+        // Check ONLY system error
+        if (
+            !response.ok ||
+            data.system_error
+        ) {
+
+            throw new Error(
+                data.system_error ||
+                "Prediction failed"
+            );
+        }
+
+
+        // Save result
+        sessionStorage.setItem(
+            "predictionData",
+            JSON.stringify(data)
+        );
+
+
+        status.innerHTML =
+            "Prediction complete!";
+
+
+        // Open result page
+        setTimeout(
+            function() {
+
+                window.location.href =
+                    "/result";
+
+            },
+            300
+        );
+
+
+    }
+
+    catch(error) {
+
+
+        console.error(error);
+
+
+        status.innerHTML =
+            "Prediction failed: " +
+            error.message;
+
+    }
+
+}
+
+
+</script>
+
+
+</body>
+
+</html>
+```

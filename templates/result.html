@@ -1,0 +1,660 @@
+```html
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Prediction Result</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+
+        body {
+
+            margin: 0;
+
+            min-height: 100vh;
+
+            font-family: Arial, sans-serif;
+
+            background:
+                radial-gradient(
+                    circle at top left,
+                    #172554,
+                    transparent 40%
+                ),
+                radial-gradient(
+                    circle at bottom right,
+                    #0c4a6e,
+                    transparent 40%
+                ),
+                #020617;
+
+            color: white;
+
+            display: flex;
+
+            justify-content: center;
+
+            align-items: center;
+
+            padding: 30px;
+        }
+
+
+        .container {
+
+            width: 100%;
+
+            max-width: 1000px;
+
+            text-align: center;
+
+            animation: appear 1s ease;
+        }
+
+
+        @keyframes appear {
+
+            from {
+
+                opacity: 0;
+
+                transform:
+                    translateY(40px);
+            }
+
+            to {
+
+                opacity: 1;
+
+                transform:
+                    translateY(0);
+            }
+
+        }
+
+
+        .title {
+
+            font-size: 42px;
+
+            margin-bottom: 8px;
+        }
+
+
+        .subtitle {
+
+            color: #7dd3fc;
+
+            margin-bottom: 35px;
+        }
+
+
+        .main-result {
+
+            background:
+                rgba(15, 23, 42, 0.9);
+
+            border:
+                1px solid #38bdf8;
+
+            border-radius: 25px;
+
+            padding: 35px;
+
+            box-shadow:
+                0 0 30px
+                rgba(56, 189, 248, 0.25);
+
+            margin-bottom: 25px;
+        }
+
+
+        .output-label {
+
+            color: #94a3b8;
+
+            font-size: 16px;
+        }
+
+
+        .output {
+
+            font-size: 64px;
+
+            font-weight: bold;
+
+            color: #38bdf8;
+
+            margin: 10px 0;
+
+            text-shadow:
+                0 0 20px
+                rgba(56,189,248,0.6);
+        }
+
+
+        .inputs {
+
+            color: #cbd5e1;
+        }
+
+
+        .cards {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(3, 1fr);
+
+            gap: 20px;
+
+            margin-bottom: 25px;
+        }
+
+
+        .card {
+
+            background:
+                rgba(15, 23, 42, 0.85);
+
+            border:
+                1px solid #334155;
+
+            border-radius: 18px;
+
+            padding: 25px;
+
+            transition: 0.3s;
+        }
+
+
+        .card:hover {
+
+            transform:
+                translateY(-5px);
+
+            border-color:
+                #38bdf8;
+
+            box-shadow:
+                0 0 20px
+                rgba(56,189,248,0.25);
+        }
+
+
+        .card-title {
+
+            color: #94a3b8;
+
+            margin-bottom: 10px;
+        }
+
+
+        .value {
+
+            font-size: 30px;
+
+            font-weight: bold;
+
+            color: #f8fafc;
+        }
+
+
+        .information {
+
+            background:
+                rgba(15, 23, 42, 0.85);
+
+            border:
+                1px solid #334155;
+
+            border-radius: 20px;
+
+            padding: 25px;
+
+            margin-bottom: 25px;
+
+            text-align: left;
+        }
+
+
+        .information h2 {
+
+            color: #38bdf8;
+
+            margin-top: 0;
+        }
+
+
+        .information p {
+
+            color: #cbd5e1;
+
+            line-height: 1.7;
+        }
+
+
+        .buttons {
+
+            display: flex;
+
+            justify-content: center;
+
+            gap: 15px;
+
+            flex-wrap: wrap;
+        }
+
+
+        button {
+
+            padding:
+                15px 30px;
+
+            border: none;
+
+            border-radius: 30px;
+
+            font-size: 16px;
+
+            font-weight: bold;
+
+            cursor: pointer;
+
+            color: white;
+
+            background:
+                linear-gradient(
+                    90deg,
+                    #06b6d4,
+                    #2563eb
+                );
+
+            transition: 0.3s;
+        }
+
+
+        button:hover {
+
+            transform:
+                scale(1.05);
+
+            box-shadow:
+                0 0 25px
+                rgba(56,189,248,0.6);
+        }
+
+
+        .secondary {
+
+            background:
+                #1e293b;
+        }
+
+
+        @media(max-width:700px) {
+
+            .title {
+
+                font-size: 30px;
+            }
+
+
+            .cards {
+
+                grid-template-columns:
+                    1fr;
+            }
+
+
+            .output {
+
+                font-size: 48px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="container">
+
+
+    <div class="title">
+
+        Prediction Result
+
+    </div>
+
+
+    <div class="subtitle">
+
+        Approximate 8-bit Multiplier • ML Analysis
+
+    </div>
+
+
+    <!-- MAIN OUTPUT -->
+
+    <div class="main-result">
+
+
+        <div class="output-label">
+
+            PREDICTED OUTPUT
+
+        </div>
+
+
+        <div
+            class="output"
+            id="output"
+        >
+
+            --
+
+        </div>
+
+
+        <div class="inputs">
+
+            Input A:
+
+            <span id="inputA">
+                --
+            </span>
+
+
+            &nbsp; × &nbsp;
+
+
+            Input B:
+
+            <span id="inputB">
+                --
+            </span>
+
+        </div>
+
+
+    </div>
+
+
+    <!-- RESULT CARDS -->
+
+    <div class="cards">
+
+
+        <div class="card">
+
+
+            <div class="card-title">
+
+                Predicted Area
+
+            </div>
+
+
+            <div class="value">
+
+                <span id="area">
+                    --
+                </span>
+
+            </div>
+
+
+        </div>
+
+
+        <div class="card">
+
+
+            <div class="card-title">
+
+                Accuracy
+
+            </div>
+
+
+            <div class="value">
+
+                <span id="accuracy">
+                    --
+                </span>%
+
+            </div>
+
+
+        </div>
+
+
+        <div class="card">
+
+
+            <div class="card-title">
+
+                Prediction Error
+
+            </div>
+
+
+            <div class="value">
+
+                <span id="predictionError">
+                    --
+                </span>%
+
+            </div>
+
+
+        </div>
+
+
+    </div>
+
+
+    <!-- INFORMATION -->
+
+    <div class="information">
+
+
+        <h2>
+
+            What does this result mean?
+
+        </h2>
+
+
+        <p>
+
+            The machine learning model analyzes
+            the two 8-bit input values and predicts
+            the approximate multiplier output.
+
+        </p>
+
+
+        <p>
+
+            The model also estimates hardware
+            area, accuracy and prediction error.
+
+        </p>
+
+
+        <p>
+
+            A lower area can indicate a smaller
+            hardware design, while higher accuracy
+            means the approximate multiplier gives
+            results closer to the expected value.
+
+        </p>
+
+
+        <p>
+
+            <b>Selected Design:</b>
+
+            <span id="design">
+                Design 1
+            </span>
+
+        </p>
+
+
+    </div>
+
+
+    <!-- BUTTONS -->
+
+    <div class="buttons">
+
+
+        <button onclick="viewGraphs()">
+
+            VIEW GRAPH ANALYSIS
+
+        </button>
+
+
+        <button
+            class="secondary"
+            onclick="newPrediction()">
+
+            NEW PREDICTION
+
+        </button>
+
+
+    </div>
+
+
+</div>
+
+
+<script>
+
+
+// Get saved prediction
+const savedData =
+    sessionStorage.getItem(
+        "predictionData"
+    );
+
+
+if (!savedData) {
+
+
+    alert(
+        "No prediction data found."
+    );
+
+
+    window.location.href =
+        "/dashboard";
+
+
+}
+
+
+else {
+
+
+    const data =
+        JSON.parse(savedData);
+
+
+    // Output
+    document.getElementById(
+        "output"
+    ).textContent =
+        data.Y;
+
+
+    // Input A
+    document.getElementById(
+        "inputA"
+    ).textContent =
+        data.A;
+
+
+    // Input B
+    document.getElementById(
+        "inputB"
+    ).textContent =
+        data.B;
+
+
+    // Area
+    document.getElementById(
+        "area"
+    ).textContent =
+        data.area;
+
+
+    // Accuracy
+    document.getElementById(
+        "accuracy"
+    ).textContent =
+        data.accuracy;
+
+
+    // Prediction error
+    document.getElementById(
+        "predictionError"
+    ).textContent =
+        data.prediction_error;
+
+
+    // Design
+    document.getElementById(
+        "design"
+    ).textContent =
+        data.design ||
+        "Design 1";
+
+}
+
+
+// Graph page
+function viewGraphs() {
+
+    window.location.href =
+        "/graphs";
+
+}
+
+
+// New prediction
+function newPrediction() {
+
+    sessionStorage.removeItem(
+        "predictionData"
+    );
+
+    window.location.href =
+        "/dashboard";
+
+}
+
+
+</script>
+
+
+</body>
+
+</html>
+```
